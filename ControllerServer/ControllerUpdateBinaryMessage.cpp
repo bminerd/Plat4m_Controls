@@ -45,7 +45,7 @@
 
 #include <Plat4m_Controls/ControllerServer/ControllerUpdateBinaryMessage.h>
 #include <Plat4m_Controls/ControllerServer/ControllerServerBinaryMessages.h>
-#include <Platm4_Core/ByteArrayParser.h>
+#include <Plat4m_Core/ByteArrayParser.h>
 
 using Plat4m::Controls::ControllerUpdateBinaryMessage;
 using namespace Plat4m::Controls::ControllerServerBinaryMessages;

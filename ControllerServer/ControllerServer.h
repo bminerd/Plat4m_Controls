@@ -48,9 +48,9 @@
 
 // Plat4m includes
 #include <Plat4m_Core/Plat4m.h>
-#include <BinaryMessageServer.h>
+#include <Plat4m_Core/ComProtocolPlat4m/BinaryMessageServer.h>
 #include <Plat4m_Core/ErrorTemplate.h>
-#include <Controller.h>
+#include <Plat4m_Controls/Controller.h>
 #include <Plat4m_Core/Thread.h>
 #include <Plat4m_Controls/ControllerServer/ControllerUpdateMessage.h>
 #include <Plat4m_Controls/ControllerServer/ControllerServerGetCountMessage.h>
@@ -131,11 +131,11 @@ private:
 
     Config myConfig;
 
-    WaitCondition& myWaitCondition;
-
     List<Controller*> myControllerList;
 
     Thread& myOutputThread;
+
+    WaitCondition& myWaitCondition;
 
     // TODO: This only works for one Controller currently
 

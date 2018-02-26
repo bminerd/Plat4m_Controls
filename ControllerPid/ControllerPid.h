@@ -56,7 +56,7 @@
 namespace Plat4m
 {
 
-namespace Control
+namespace Controls
 {
 
 //------------------------------------------------------------------------------

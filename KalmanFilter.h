@@ -49,6 +49,7 @@
 
 #include <float.h>
 
+#include <Eigen/Core>
 #include <Eigen/Dense>
 #include <Eigen/SVD>
 

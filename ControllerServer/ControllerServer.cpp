@@ -43,15 +43,15 @@
 // Include files
 //------------------------------------------------------------------------------
 
-#include <ControllerServer.h>
-#include <BinaryMessageHandlerTemplate.h>
-#include <ControllerServerGetCountBinaryMessage.h>
-#include <ControllerServerGetCountResponseBinaryMessage.h>
-#include <ControllerServerSetConfigBinaryMessage.h>
-#include <ControllerServerSetConfigResponseBinaryMessage.h>
-#include <ControllerUpdateMessage.h>
-#include <ControllerUpdateBinaryMessage.h>
-#include <ByteArrayN.h>
+#include <Plat4m_Controls/ControllerServer/ControllerServer.h>
+#include <Plat4m_Core/ComProtocolPlat4m/BinaryMessageHandlerTemplate.h>
+#include <Plat4m_Controls/ControllerServer/ControllerServerGetCountBinaryMessage.h>
+#include <Plat4m_Controls/ControllerServer/ControllerServerGetCountResponseBinaryMessage.h>
+#include <Plat4m_Controls/ControllerServer/ControllerServerSetConfigBinaryMessage.h>
+#include <Plat4m_Controls/ControllerServer/ControllerServerSetConfigResponseBinaryMessage.h>
+#include <Plat4m_Controls/ControllerServer/ControllerUpdateMessage.h>
+#include <Plat4m_Controls/ControllerServer/ControllerUpdateBinaryMessage.h>
+#include <Plat4m_Core/ByteArrayN.h>
 
 using Plat4m::Controls::ControllerServer;
 using Plat4m::Module;
@@ -74,11 +74,11 @@ ControllerServer::ControllerServer(
                         comProtocolPlat4mBinary,
                         binaryMessageFrameHandler),
     myConfig(),
-	myWaitCondition(System::createWaitCondition()),
     myControllerList(),
     myOutputThread(System::createThread(
                   createCallback(this, &ControllerServer::outputThreadCallback),
                   myOutputThreadPeriodMs)),
+    myWaitCondition(System::createWaitCondition(myOutputThread)),
     myUpdateCount(0)
 {
     initialize();
@@ -195,7 +195,7 @@ void ControllerServer::controllerUpdateCallback()
 //------------------------------------------------------------------------------
 void ControllerServer::outputThreadCallback()
 {
-	myWaitCondition.waitFast();
+	myWaitCondition.wait();
 
     uint8_t i = 0;
     List<Controller*>::Iterator iterator = myControllerList.iterator();

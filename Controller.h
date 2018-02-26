@@ -58,7 +58,7 @@
 namespace Plat4m
 {
 
-namespace Control
+namespace Controls
 {
 
 //------------------------------------------------------------------------------
@@ -183,7 +183,7 @@ private:
     virtual void driverReset() = 0;
 };
 
-}; // namespace Control
+}; // namespace Controls
 
 }; // namespace Plat4m
 
