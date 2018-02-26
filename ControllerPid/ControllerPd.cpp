@@ -43,10 +43,10 @@
 // Include files
 //------------------------------------------------------------------------------
 
-#include <ControllerPd.h>
+#include <Plat4m_Controls/ControllerPid/ControllerPd.h>
 
-using Plat4m::Control::ControllerPd;
-using Plat4m::Control::Controller;
+using Plat4m::Controls::ControllerPd;
+using Plat4m::Controls::Controller;
 
 using Plat4m::Module;
 

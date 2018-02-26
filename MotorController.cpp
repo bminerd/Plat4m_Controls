@@ -43,9 +43,9 @@
 // Include files
 //------------------------------------------------------------------------------
 
-#include <MotorController.h>
+#include <Plat4m_Controls/MotorController.h>
 
-using Plat4m::Control::MotorController;
+using Plat4m::Controls::MotorController;
 
 using Plat4m::Module;
 

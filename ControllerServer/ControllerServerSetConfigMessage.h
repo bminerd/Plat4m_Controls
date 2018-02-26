@@ -39,8 +39,8 @@
 /// @brief ControllerServerSetConfigMessage struct header file.
 ///
 
-#ifndef PLAT4M_CONTROL_CONTROLLER_SERVER_SET_CONFIG_MESSAGE_H
-#define PLAT4M_CONTROL_CONTROLLER_SERVER_SET_CONFIG_MESSAGE_H
+#ifndef PLAT4M_CONTROLS_CONTROLLER_SERVER_SET_CONFIG_MESSAGE_H
+#define PLAT4M_CONTROLS_CONTROLLER_SERVER_SET_CONFIG_MESSAGE_H
 
 //------------------------------------------------------------------------------
 // Include files
@@ -55,7 +55,7 @@
 namespace Plat4m
 {
 
-namespace Control
+namespace Controls
 {
 
 //------------------------------------------------------------------------------
@@ -87,8 +87,8 @@ public:
     uint32_t outputRateDivisionFactor;
 };
 
-}; // namespace Control
+}; // namespace Controls
 
 }; // namespace Plat4m
 
-#endif // PLAT4M_CONTROL_CONTROLLER_SERVER_SET_CONFIG_MESSAGE_H
+#endif // PLAT4M_CONTROLS_CONTROLLER_SERVER_SET_CONFIG_MESSAGE_H

@@ -53,7 +53,7 @@
 #include <ControllerUpdateBinaryMessage.h>
 #include <ByteArrayN.h>
 
-using Plat4m::Control::ControllerServer;
+using Plat4m::Controls::ControllerServer;
 using Plat4m::Module;
 
 //------------------------------------------------------------------------------

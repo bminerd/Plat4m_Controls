@@ -11,7 +11,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 Benjamin Minerd
+// Copyright (c) 2016 Benjamin Minerd
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,14 +33,14 @@
 //------------------------------------------------------------------------------
 
 ///
-/// @file Plat4mController.h
+/// @file Plat4mControl.h
 /// @author Ben Minerd
-/// @date 11/4/16
-/// @brief Plat4m core namespace config file.
+/// @date 11/4/2016
+/// @brief Plat4m Controls namespace config file.
 ///
 
-#ifndef PLAT4M_CONTROL_H
-#define PLAT4M_CONTROL_H
+#ifndef PLAT4M_CONTROLS_H
+#define PLAT4M_CONTROLS_H
 
 //------------------------------------------------------------------------------
 // Include files
@@ -53,15 +53,15 @@
 namespace Plat4m
 {
 
-namespace Control
+namespace Controls
 {
     //--------------------------------------------------------------------------
     // Variables
     //--------------------------------------------------------------------------
 
-    const char* plat4mControlVersion = "0.0.1";
-}; // namespace Control
+    const char* plat4mControlsVersion = "0.0.1";
+}; // namespace Controls
 
 }; // namespace Plat4m
 
-#endif // PLAT4M_CONTROL_H
+#endif // PLAT4M_CONTROLS_H

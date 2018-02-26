@@ -11,7 +11,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 Benjamin Minerd
+// Copyright (c) 2016 Benjamin Minerd
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -46,9 +46,8 @@
 // Include files
 //------------------------------------------------------------------------------
 
-// Plat4m includes
-#include <Controller.h>
-#include <ErrorTemplate.h>
+#include <Plat4m_Controls/Controller.h>
+#include <Plat4m_Core/ErrorTemplate.h>
 
 //------------------------------------------------------------------------------
 // Namespaces
@@ -161,7 +160,7 @@ private:
     //--------------------------------------------------------------------------
 };
 
-}; // namespace Control
+}; // namespace Controls
 
 }; // namespace Plat4m
 

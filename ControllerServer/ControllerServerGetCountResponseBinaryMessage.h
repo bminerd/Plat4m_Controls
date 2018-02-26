@@ -39,18 +39,19 @@
 /// @brief ControllerServerGetCountResponseBinaryMessage class header file.
 ///
 
-#ifndef PLAT4M_CONTROL_CONTROLLER_SERVER_GET_COUNT_RESPONSE_BINARY_MESSAGE_H
-#define PLAT4M_CONTROL_CONTROLLER_SERVER_GET_COUNT_RESPONSE_BINARY_MESSAGE_H
+#ifndef PLAT4M_CONTROLS_CONTROLLER_SERVER_GET_COUNT_RESPONSE_BINARY_MESSAGE_H
+#define PLAT4M_CONTROLS_CONTROLLER_SERVER_GET_COUNT_RESPONSE_BINARY_MESSAGE_H
 
 //------------------------------------------------------------------------------
 // Include files
 //------------------------------------------------------------------------------
 
 #include <stdint.h>
-#include <BinaryMessage.h>
-#include <ControllerServerGetCountResponseMessage.h>
-#include <ByteArray.h>
-#include <Array.h>
+
+#include <Plat4m_Core/ComProtocolPlat4m/BinaryMessage.h>
+#include <Plat4m_Controls/ControllerServer/ControllerServerGetCountResponseMessage.h>
+#include <Plat4m_Core/ByteArray.h>
+#include <Plat4m_Core/Array.h>
 
 //------------------------------------------------------------------------------
 // Namespaces
@@ -59,7 +60,7 @@
 namespace Plat4m
 {
 
-namespace Control
+namespace Controls
 {
 
 //------------------------------------------------------------------------------
@@ -104,7 +105,7 @@ private:
     bool binaryMessageToByteArray(ByteArray& byteArray) const;
 };
 
-}; // namespace Control
+}; // namespace Controls
 
 }; // namespace Plat4m
 

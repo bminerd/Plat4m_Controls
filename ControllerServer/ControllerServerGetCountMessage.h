@@ -39,8 +39,8 @@
 /// @brief ControllerServerGetCountMessage struct header file.
 ///
 
-#ifndef PLAT4M_CONTROL_CONTROLLER_SERVER_GET_COUNT_MESSAGE_H
-#define PLAT4M_CONTROL_CONTROLLER_SERVER_GET_COUNT_MESSAGE_H
+#ifndef PLAT4M_CONTROLS_CONTROLLER_SERVER_GET_COUNT_MESSAGE_H
+#define PLAT4M_CONTROLS_CONTROLLER_SERVER_GET_COUNT_MESSAGE_H
 
 //------------------------------------------------------------------------------
 // Include files
@@ -55,7 +55,7 @@
 namespace Plat4m
 {
 
-namespace Control
+namespace Controls
 {
 
 //------------------------------------------------------------------------------
@@ -83,8 +83,8 @@ public:
     // No fields
 };
 
-}; // namespace Control
+}; // namespace Controls
 
 }; // namespace Plat4m
 
-#endif // PLAT4M_CONTROL_CONTROLLER_SERVER_GET_COUNT_MESSAGE_H
+#endif // PLAT4M_CONTROLS_CONTROLLER_SERVER_GET_COUNT_MESSAGE_H

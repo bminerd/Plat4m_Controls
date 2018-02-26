@@ -46,9 +46,8 @@
 // Include files
 //------------------------------------------------------------------------------
 
-// Plat4m includes
-#include <Plat4m.h>
-#include <ControllerPid.h>
+#include <Plat4m_Core/Plat4m.h>
+#include <Plat4m_Controls/ControllerPid/ControllerPid.h>
 
 //------------------------------------------------------------------------------
 // Namespaces
@@ -57,7 +56,7 @@
 namespace Plat4m
 {
 
-namespace Control
+namespace Controls
 {
 
 //------------------------------------------------------------------------------
@@ -87,7 +86,7 @@ public:
     virtual ~ControllerPd();
 };
 
-}; // namespace Control
+}; // namespace Controls
 
 }; // namespace Plat4m
 

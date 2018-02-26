@@ -46,9 +46,9 @@
 // Include files
 //------------------------------------------------------------------------------
 
-#include <Plat4m.h>
-#include <Module.h>
-#include <ErrorTemplate.h>
+#include <Plat4m_Core/Plat4m.h>
+#include <Plat4m_Core/Module.h>
+#include <Plat4m_Core/ErrorTemplate.h>
 
 //------------------------------------------------------------------------------
 // Namespaces
@@ -57,7 +57,7 @@
 namespace Plat4m
 {
 
-namespace Control
+namespace Controls
 {
 
 //------------------------------------------------------------------------------

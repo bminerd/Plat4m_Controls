@@ -1,59 +1,82 @@
-/*------------------------------------------------------------------------------
- *                  __                           ___
- *                 || |             __          //  |
- *       _______   || |   _______  || |__      //   |    _____  ___
- *      ||  ___ \  || |  // ___  | ||  __|    // _  |   ||  _ \/ _ \
- *      || |  || | || | || |  || | || |      // /|| |   || |\\  /\\ \
- *      || |__|| | || | || |__|| | || |     // /_|| |_  || | || | || |
- *      ||  ____/  || |  \\____  | || |__  //_____   _| || | || | || |
- *      || |       ||_|       ||_|  \\___|       ||_|   ||_| ||_| ||_|
- *      || |
- *      ||_|
- *
- * Copyright (c) 2013 Ben Minerd. All rights reserved.
- *
- * GNU Lesser General Public License Usage
- * This file may be used under the terms of the GNU Lesser General Public
- * License version 2.1 as published by the Free Software Foundation and
- * appearing in the file LICENSE.LGPL included in the packaging of this file.
- * Please review the following information to ensure the GNU Lesser General
- * Public License version 2.1 requirements will be met:
- * http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
- *----------------------------------------------------------------------------*/
+//------------------------------------------------------------------------------
+//       _______    __                           ___
+//      ||  ___ \  || |             __          //  |
+//      || |  || | || |   _______  || |__      //   |    _____  ___
+//      || |__|| | || |  // ___  | ||  __|    // _  |   ||  _ \/ _ \
+//      ||  ____/  || | || |  || | || |      // /|| |   || |\\  /\\ \
+//      || |       || | || |__|| | || |     // /_|| |_  || | || | || |
+//      || |       || |  \\____  | || |__  //_____   _| || | || | || |
+//      ||_|       ||_|       ||_|  \\___|       ||_|   ||_| ||_| ||_|
+//
+//
+// The MIT License (MIT)
+//
+// Copyright (c) 2013 Benjamin Minerd
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//------------------------------------------------------------------------------
+
 
 ///
 /// @file KalmanFilter.h
 /// @author Ben Minerd
-/// @date 3/28/13
-/// @brief KalmanFilter class.
+/// @date 3/28/2013
+/// @brief KalmanFilter class header file.
 ///
 
-#ifndef KALMAN_FILTER_H
-#define KALMAN_FILTER_H
+#ifndef PLAT4M_KALMAN_FILTER_H
+#define PLAT4M_KALMAN_FILTER_H
 
-/*------------------------------------------------------------------------------
- * Include files
- *----------------------------------------------------------------------------*/
+//------------------------------------------------------------------------------
+// Include files
+//------------------------------------------------------------------------------
+
+#include <float.h>
 
 #include <Eigen/Dense>
 #include <Eigen/SVD>
-#include <float.h>
 
-/*------------------------------------------------------------------------------
- * Classes
- *----------------------------------------------------------------------------*/
+//------------------------------------------------------------------------------
+// Namespaces
+//------------------------------------------------------------------------------
 
 namespace Plat4m
 {
 
-template<typename ValueType, int nStates, int nObservables, int nControlInputs>
+namespace Controls
+{
+
+//------------------------------------------------------------------------------
+// Classes
+//------------------------------------------------------------------------------
+
+template<typename ValueType,
+         uint32_t nStates,
+         uint32_t nObservables,
+         uint32_t nControlInputs>
 class KalmanFilter
 {
 public:
 
-	/*--------------------------------------------------------------------------
-	 * Public typedefs
-	 *------------------------------------------------------------------------*/
+    //--------------------------------------------------------------------------
+    // Public types
+    //--------------------------------------------------------------------------
 
 	typedef Eigen::Matrix<ValueType, nStates, nStates> MatrixNbyN;
 
@@ -67,9 +90,9 @@ public:
 
 	typedef Eigen::Matrix<ValueType, nObservables, 1> VectorM;
 
-	/*--------------------------------------------------------------------------
-	 * Public constructors
-	 *------------------------------------------------------------------------*/
+    //--------------------------------------------------------------------------
+    // Public constructors
+    //--------------------------------------------------------------------------
 
 	KalmanFilter() :
 		myXVector(),
@@ -83,9 +106,9 @@ public:
 	{
 	}
 
-	/*--------------------------------------------------------------------------
-	 * Public methods
-	 *------------------------------------------------------------------------*/
+    //--------------------------------------------------------------------------
+    // Public methods
+    //--------------------------------------------------------------------------
 
 	//--------------------------------------------------------------------------
 	void predict()
@@ -99,12 +122,31 @@ public:
 		// B = control matrix
 		// U = control input vector
 		//
-		myXVector = (myFMatrix * myXVector) + (myBMatrix * myUVector);
+        myXVector = myFMatrix * myXVector;
 
 		// Covariance estimate
 		// P = (F * P * F_T) + Q
 		myPMatrix = (myFMatrix * myPMatrix * myFMatrix.transpose()) + myQMatrix;
 	}
+
+    //--------------------------------------------------------------------------
+    void predict(const Eigen::Matrix<ValueType, nControlInputs, 1>& uVector)
+    {
+        // State estimate
+        // X = (F * X) + (B * U)
+        //
+        // Where...
+        // X = state vector
+        // F = state transition matrix
+        // B = control matrix
+        // U = control input vector
+        //
+        myXVector = (myFMatrix * myXVector) + (myBMatrix * myUVector);
+
+        // Covariance estimate
+        // P = (F * P * F_T) + Q
+        myPMatrix = (myFMatrix * myPMatrix * myFMatrix.transpose()) + myQMatrix;
+    }
 
 	//--------------------------------------------------------------------------
 	void update(const VectorM& measurementVector)
@@ -135,16 +177,16 @@ public:
 	//--------------------------------------------------------------------------
 	static MatrixMbyM pseudoInverse(const MatrixMbyM& matrix)
 	{
-		// Compute Moore-Penrose pseudo inverse
+        // Compute Moore-Penrose pseudo inverse
 
 		ValueType pinvTolerance = FLT_EPSILON;
 
-		Eigen::JacobiSVD< MatrixMbyM > matrixSvd(matrix,
-											     Eigen::ComputeFullU |
-												 Eigen::ComputeFullV);
+		Eigen::JacobiSVD<MatrixMbyM> matrixSvd(matrix,
+		                                       Eigen::ComputeFullU |
+											   Eigen::ComputeFullV);
 		VectorM inverseSvdValues;
 
-		for (int i = 0; i < nObservables; i++)
+		for (uint32_t i = 0; i < nObservables; i++)
 		{
 		    if (matrixSvd.singularValues()(i) > pinvTolerance)
 		    {
@@ -158,10 +200,9 @@ public:
 
 		MatrixMbyM matrixInverse;
 
-		matrixInverse =
-		    (matrixSvd.matrixV()           *
-		     inverseSvdValues.asDiagonal() *
-			 matrixSvd.matrixU().transpose());
+		matrixInverse = (matrixSvd.matrixV()           *
+		                 inverseSvdValues.asDiagonal() *
+		                 matrixSvd.matrixU().transpose());
 
 		return matrixInverse;
 	}
@@ -264,9 +305,9 @@ public:
 
 private:
 
-	/*--------------------------------------------------------------------------
-	 * Private data members
-	 *------------------------------------------------------------------------*/
+    //--------------------------------------------------------------------------
+    // Private data members
+    //--------------------------------------------------------------------------
 
 	///
 	/// @brief Contains the current values of the filtered state variables. Also
@@ -317,6 +358,8 @@ private:
 	MatrixMbyM myRMatrix;
 };
 
+}; // namespace Controls
+
 }; // namespace Plat4m
 
-#endif // KALMAN_FILTER_H
+#endif // PLAT4M_KALMAN_FILTER_H

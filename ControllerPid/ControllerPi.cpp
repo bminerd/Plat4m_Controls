@@ -43,10 +43,10 @@
 // Include files
 //------------------------------------------------------------------------------
 
-#include <ControllerPi.h>
+#include <Plat4m_Controls/ControllerPid/ControllerPi.h>
 
-using Plat4m::Control::ControllerPi;
-using Plat4m::Control::Controller;
+using Plat4m::Controls::ControllerPi;
+using Plat4m::Controls::Controller;
 
 using Plat4m::Module;
 

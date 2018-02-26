@@ -43,12 +43,12 @@
 // Include files
 //------------------------------------------------------------------------------
 
-#include <ControllerServerSetConfigBinaryMessage.h>
-#include <ControllerServerBinaryMessages.h>
-#include <ByteArrayParser.h>
+#include <Plat4m_Controls/ControllerServer/ControllerServerSetConfigBinaryMessage.h>
+#include <Plat4m_Controls/ControllerServer/ControllerServerBinaryMessages.h>
+#include <Plat4m_Core/ByteArrayParser.h>
 
-using Plat4m::Control::ControllerServerSetConfigBinaryMessage;
-using namespace Plat4m::Control::ControllerServerBinaryMessages;
+using Plat4m::Controls::ControllerServerSetConfigBinaryMessage;
+using namespace Plat4m::Controls::ControllerServerBinaryMessages;
 
 //------------------------------------------------------------------------------
 // Public constructors

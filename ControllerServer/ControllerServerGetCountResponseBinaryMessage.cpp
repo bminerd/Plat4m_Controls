@@ -43,12 +43,12 @@
 // Include files
 //------------------------------------------------------------------------------
 
-#include <ControllerServerGetCountResponseBinaryMessage.h>
-#include <ControllerServerBinaryMessages.h>
-#include <ByteArrayParser.h>
+#include <Plat4m_Controls/ControllerServer/ControllerServerGetCountResponseBinaryMessage.h>
+#include <Plat4m_Controls/ControllerServer/ControllerServerBinaryMessages.h>
+#include <Plat4m_Core/ByteArrayParser.h>
 
-using Plat4m::Control::ControllerServerGetCountResponseBinaryMessage;
-using namespace Plat4m::Control::ControllerServerBinaryMessages;
+using Plat4m::Controls::ControllerServerGetCountResponseBinaryMessage;
+using namespace Plat4m::Controls::ControllerServerBinaryMessages;
 
 //------------------------------------------------------------------------------
 // Public constructors

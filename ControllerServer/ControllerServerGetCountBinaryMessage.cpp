@@ -43,11 +43,11 @@
 // Include files
 //------------------------------------------------------------------------------
 
-#include <ControllerServerGetCountBinaryMessage.h>
-#include <ControllerServerBinaryMessages.h>
+#include <Plat4m_Controls/ControllerServer/ControllerServerGetCountBinaryMessage.h>
+#include <Plat4m_Controls/ControllerServer/ControllerServerBinaryMessages.h>
 
-using Plat4m::Control::ControllerServerGetCountBinaryMessage;
-using namespace Plat4m::Control::ControllerServerBinaryMessages;
+using Plat4m::Controls::ControllerServerGetCountBinaryMessage;
+using namespace Plat4m::Controls::ControllerServerBinaryMessages;
 
 //------------------------------------------------------------------------------
 // Public constructors

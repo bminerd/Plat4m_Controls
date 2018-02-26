@@ -39,25 +39,25 @@
 /// @brief ControllerServer class header file.
 ///
 
-#ifndef PLAT4M_CONTROL_CONTROLLER_SERVER_H
-#define PLAT4M_CONTROL_CONTROLLER_SERVER_H
+#ifndef PLAT4M_CONTROLS_CONTROLLER_SERVER_H
+#define PLAT4M_CONTROLS_CONTROLLER_SERVER_H
 
 //------------------------------------------------------------------------------
 // Include files
 //------------------------------------------------------------------------------
 
 // Plat4m includes
-#include <Plat4m.h>
+#include <Plat4m_Core/Plat4m.h>
 #include <BinaryMessageServer.h>
-#include <ErrorTemplate.h>
+#include <Plat4m_Core/ErrorTemplate.h>
 #include <Controller.h>
-#include <Thread.h>
-#include <ControllerUpdateMessage.h>
-#include <ControllerServerGetCountMessage.h>
-#include <ControllerServerGetCountResponseMessage.h>
-#include <ControllerServerSetConfigMessage.h>
-#include <ControllerServerSetConfigResponseMessage.h>
-#include <ComProtocolPlat4mBinary.h>
+#include <Plat4m_Core/Thread.h>
+#include <Plat4m_Controls/ControllerServer/ControllerUpdateMessage.h>
+#include <Plat4m_Controls/ControllerServer/ControllerServerGetCountMessage.h>
+#include <Plat4m_Controls/ControllerServer/ControllerServerGetCountResponseMessage.h>
+#include <Plat4m_Controls/ControllerServer/ControllerServerSetConfigMessage.h>
+#include <Plat4m_Controls/ControllerServer/ControllerServerSetConfigResponseMessage.h>
+#include <Plat4m_Core/ComProtocolPlat4m/ComProtocolPlat4mBinary.h>
 
 //------------------------------------------------------------------------------
 // Namespaces
@@ -66,7 +66,7 @@
 namespace Plat4m
 {
 
-namespace Control
+namespace Controls
 {
 
 //------------------------------------------------------------------------------
@@ -166,8 +166,8 @@ private:
                              ControllerServerGetCountResponseMessage& response);
 };
 
-}; // namespace Control
+}; // namespace Controls
 
 }; // namespace Plat4m
 
-#endif // PLAT4M_CONTROL_CONTROLLER_SERVER_H
+#endif // PLAT4M_CONTROLS_CONTROLLER_SERVER_H

@@ -39,15 +39,15 @@
 /// @brief ControllerServerGetCountBinaryMessage class header file.
 ///
 
-#ifndef PLAT4M_CONTROL_CONTROLLER_SERVER_GET_COUNT_BINARY_MESSAGE_H
-#define PLAT4M_CONTROL_CONTROLLER_SERVER_GET_COUNT_BINARY_MESSAGE_H
+#ifndef PLAT4M_CONTROLS_CONTROLLER_SERVER_GET_COUNT_BINARY_MESSAGE_H
+#define PLAT4M_CONTROLS_CONTROLLER_SERVER_GET_COUNT_BINARY_MESSAGE_H
 
 //------------------------------------------------------------------------------
 // Include files
 //------------------------------------------------------------------------------
 
-#include <BinaryMessage.h>
-#include <ControllerServerGetCountMessage.h>
+#include <Plat4m_Core/ComProtocolPlat4m/BinaryMessage.h>
+#include <Plat4m_Controls/ControllerServer/ControllerServerGetCountMessage.h>
 
 //------------------------------------------------------------------------------
 // Namespaces
@@ -56,7 +56,7 @@
 namespace Plat4m
 {
 
-namespace Control
+namespace Controls
 {
 
 //------------------------------------------------------------------------------
@@ -89,8 +89,8 @@ private:
     ControllerServerGetCountMessage& myMessage;
 };
 
-}; // namespace Control
+}; // namespace Controls
 
 }; // namespace Plat4m
 
-#endif // PLAT4M_CONTROL_CONTROLLER_SERVER_GET_COUNT_BINARY_MESSAGE_H
+#endif // PLAT4M_CONTROLS_CONTROLLER_SERVER_GET_COUNT_BINARY_MESSAGE_H

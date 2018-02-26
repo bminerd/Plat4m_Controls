@@ -43,9 +43,9 @@
 // Include files
 //------------------------------------------------------------------------------
 
-#include <Controller.h>
+#include <Plat4m_Controls/Controller.h>
 
-using Plat4m::Control::Controller;
+using Plat4m::Controls::Controller;
 
 using Plat4m::Module;
 
