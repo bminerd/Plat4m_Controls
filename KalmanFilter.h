@@ -133,6 +133,8 @@ public:
     //--------------------------------------------------------------------------
     void predict(const Eigen::Matrix<ValueType, nControlInputs, 1>& uVector)
     {
+        myUVector = uVector;
+
         // State estimate
         // X = (F * X) + (B * U)
         //
