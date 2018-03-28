@@ -154,13 +154,13 @@ public:
 	//--------------------------------------------------------------------------
 	void update(const VectorM& measurementVector)
 	{
-		VectorM yMatrix;
+		VectorM yVector;
 		MatrixMbyM sMatrix;
 		MatrixMbyM sMatrixInverse;
 		MatrixNbyM kMatrix;
 
 		// Measurement
-		yMatrix = measurementVector - (myHMatrix * myXVector);
+		yVector = measurementVector - (myHMatrix * myXVector);
 
 		// Residual covariance
 
@@ -172,7 +172,7 @@ public:
 		kMatrix = myPMatrix * myHMatrix.transpose() * sMatrixInverse;
 
 		// Updated state estimate
-		myXVector = myXVector + kMatrix * yMatrix;
+		myXVector = myXVector + kMatrix * yVector;
 		// Updated estimate covariance
 		myPMatrix = (MatrixNbyN::Identity() - kMatrix * myHMatrix) * myPMatrix;
 	}
