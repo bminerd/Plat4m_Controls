@@ -35,7 +35,7 @@
 ///
 /// @file MotorControllerFocFoc.cpp
 /// @author Ben Minerd
-/// @date 8/16/2018
+/// @date 5/2/2018
 /// @brief MotorControllerFoc class source file.
 ///
 
@@ -50,11 +50,33 @@ using Plat4m::Controls::MotorController;
 
 using Plat4m::Module;
 
+using namespace Plat4m;
+
 //------------------------------------------------------------------------------
 // Private static data members
 //------------------------------------------------------------------------------
 
-const RealNumber
+// Constants
+
+const RealNumber MotorControllerFoc::myClarkeTransformMatrixValues[] =
+{
+    {          1.0,           0.0},
+    {1.0/sqrt(3.0), 2.0/sqrt(3.0)}
+};
+
+const Math::Matrix<RealNumber>
+     MotorControllerFoc::myClarkeTransformMatrix(myClarkeTransformMatrixValues);
+
+const RealNumber MotorControllerFoc::myInverseClarkeTransformMatrixValues[] =
+{
+    {     1.0,            0.0},
+    {-1.0/2.0,  sqrt(3.0)/2.0},
+    {-1.0/2.0, -sqrt(3.0)/2.0}
+};
+
+const Math::Matrix<RealNumber>
+     MotorControllerFoc::myInverseClarkeTransformMatrix(
+                                          myInverseClarkeTransformMatrixValues);
 
 //------------------------------------------------------------------------------
 // Public constructors
@@ -63,7 +85,6 @@ const RealNumber
 //------------------------------------------------------------------------------
 MotorControllerFoc::MotorControllerFoc(CurrentSensor& phaseACurrentSensor,
                                        CurrentSensor& phaseBCurrentSensor,
-                                       CurrentSensor& phaseCCurrentSensor,
                                        RotaryEncoder& rotaryEncoder,
                                        Controller& currentQController,
                                        Controller& currentDController,
@@ -73,13 +94,19 @@ MotorControllerFoc::MotorControllerFoc(CurrentSensor& phaseACurrentSensor,
     MotorController(),
     myPhaseACurrentSensor(phaseACurrentSensor),
     myPhaseBCurrentSensor(phaseBCurrentSensor),
-    myPhaseCCurrentSensor(phaseCCurrentSensor),
     myRotaryEncoder(rotaryEncoder),
     myCurrentQController(currentQController),
     myCurrentDController(currentDController),
     myPhaseAPwmOutput(phaseAPwmOutput),
     myPhaseBPwmOutput(phaseBPwmOutput),
-    myPhaseCPwmOutput(phaseCPwmOutput)
+    myPhaseCPwmOutput(phaseCPwmOutput),
+    myParkTransformMatrix(),
+    myInverseParkTransformMatrix(),
+    myCurrentABVector(),
+    myCurrentAlphaBetaVector(),
+    myCurrentDQVector(),
+    myVoltageDQVector(),
+    myVoltageAlphaBetaVector()
 {
 }
 
@@ -109,22 +136,52 @@ Module::Error MotorControllerFoc::driverSetEnabled(const bool enabled)
 //------------------------------------------------------------------------------
 void MotorControllerFoc::update()
 {
+    // Get A+B phase currents
+
+    myCurrentABVector(0) = myPhaseACurrentSensor.getCurrentAFast();
+    myCurrentABVector(1) = myPhaseBCurrentSensor.getCurrentAFast();
+
     // Electrical angle
+
     AngleRadians electricalAngleRadians = myRotaryEncoder.getAngleRadiansFast();
+
+    RealNumber cosTheta = cos(electricalAngleRadians);
+    RealNumber sinTheta = sin(electricalAngleRadians);
 
     // Clarke transform
 
+    myCurrentAlphaBetaVector = myClarkeTransformMatrix * myCurrentABVector;
 
     // Park transform
 
+    myParkTransformMatrix(0, 0) =  cosTheta;
+    myParkTransformMatrix(0, 1) =  sinTheta;
+    myParkTransformMatrix(1, 0) = -sinTheta;
+    myParkTransformMatrix(1, 1) =  cosTheta;
+
+    myCurrentDQVector = myParkTransformMatrix * myCurrentAlphaBetaVector;
+
     // Apply controllers
+
+    myVoltageDQVector(0) = myCurrentDController.update(myCurrentDQVector(0));
+    myVoltageDQVector(1) = myCurrentQController.update(myCurrentDQVector(1));
 
     // Inverse Park transform
 
+    myInverseParkTransformMatrix(0, 0) =  cosTheta;
+    myInverseParkTransformMatrix(0, 1) = -sinTheta;
+    myInverseParkTransformMatrix(1, 0) =  sinTheta;
+    myInverseParkTransformMatrix(1, 1) =  cosTheta;
+
+    myVoltageAlphaBetaVector = myInverseParkTransformMatrix * myVoltageDQVector;
+
     // Inverse Clarke transform
 
+    myPhaseDutyCyclesVector =
+                      myInverseClarkeTransformMatrix * myVoltageAlphaBetaVector;
+
     // Set phase PWMs
-    myPhaseAPwmOutput.setDutyCycleNormalizedFast(0.0);
-    myPhaseBPwmOutput.setDutyCycleNormalizedFast(0.0);
-    myPhaseCPwmOutput.setDutyCycleNormalizedFast(0.0);
+    myPhaseAPwmOutput.setDutyCycleNormalizedFast(myPhaseDutyCyclesVector(0));
+    myPhaseBPwmOutput.setDutyCycleNormalizedFast(myPhaseDutyCyclesVector(1));
+    myPhaseCPwmOutput.setDutyCycleNormalizedFast(myPhaseDutyCyclesVector(2));
 }

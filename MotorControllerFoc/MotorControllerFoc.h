@@ -94,7 +94,6 @@ public:
 
     MotorControllerFoc(CurrentSensor& phaseACurrentSensor,
                        CurrentSensor& phaseBCurrentSensor,
-                       CurrentSensor& phaseCCurrentSensor,
                        RotaryEncoder& rotaryEncoder,
                        Controller& currentQController,
                        Controller& currentDController,
@@ -124,21 +123,21 @@ private:
 
     // Constants
 
-    static const RealNumber myClarkeTransformMatrixValues[];
+    static const RealNumber myClarkeTransformMatrixValues[][];
 
-    static const Math::Matrix myClarkeTransformMatrix;
+    static const Math::Matrix<RealNumber, 2, 2> myClarkeTransformMatrix;
 
-    static const RealNumber myParkTransformMatrixValues[];
+    static const RealNumber myParkTransformMatrixValues[][];
 
-    static const Math::Matrix myParkTransformMatrix;
+    static const Math::Matrix<RealNumber, 2, 2> myParkTransformMatrix;
 
-    static const RealNumber myInverseParkTransformMatrixValues[];
+    static const RealNumber myInverseParkTransformMatrixValues[][];
 
-    static const Math::Matrix myInverseParkTransformMatrix;
+    static const Math::Matrix<RealNumber, 2, 2> myInverseParkTransformMatrix;
 
-    static const RealNumber myInverseClarkeTransformMatrixValues[];
+    static const RealNumber myInverseClarkeTransformMatrixValues[][];
 
-    static const Math::Matrix myInverseClarkeTransformMatrix;
+    static const Math::Matrix<RealNumber, 2, 3> myInverseClarkeTransformMatrix;
 
     //--------------------------------------------------------------------------
     // Private data members
@@ -146,16 +145,25 @@ private:
 
     CurrentSensor& myPhaseACurrentSensor;
     CurrentSensor& myPhaseBCurrentSensor;
-    CurrentSensor& myPhaseCCurrentSensor;
 
     RotaryEncoder& myRotaryEncoder;
 
-    Controller& myCurrentQController;
     Controller& myCurrentDController;
+    Controller& myCurrentQController;
 
     PwmOutput& myPhaseAPwmOutput;
     PwmOutput& myPhaseBPwmOutput;
     PwmOutput& myPhaseCPwmOutput;
+
+    Math::Matrix<RealNumber, 2, 2> myParkTransformMatrix;
+    Math::Matrix<RealNumber, 2, 2> myInverseParkTransformMatrix;
+
+    Math::Vector<RealNumber, 2> myCurrentABVector;
+    Math::Vector<RealNumber, 2> myCurrentAlphaBetaVector;
+    Math::Vector<RealNumber, 2> myCurrentDQVector;
+    Math::Vector<RealNumber, 2> myVoltageDQVector;
+    Math::Vector<RealNumber, 2> myVoltageAlphaBetaVector;
+    Math::Vector<RealNumber, 3> myPhaseDutyCyclesVector;
 
     //--------------------------------------------------------------------------
     // Private methods implemented from Module
@@ -168,6 +176,8 @@ private:
     //--------------------------------------------------------------------------
 
     void update();
+
+
 };
 
 }; // namespace Control
