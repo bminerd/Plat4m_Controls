@@ -11,7 +11,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2013 Benjamin Minerd
+// Copyright (c) 2013-2023 Benjamin Minerd
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,6 @@
 // SOFTWARE.
 //------------------------------------------------------------------------------
 
-
 ///
 /// @file KalmanFilter.h
 /// @author Ben Minerd
@@ -40,18 +39,21 @@
 /// @brief KalmanFilter class header file.
 ///
 
-#ifndef PLAT4M_KALMAN_FILTER_H
-#define PLAT4M_KALMAN_FILTER_H
+#ifndef PLAT4M_CONTROLS_KALMAN_FILTER_H
+#define PLAT4M_CONTROLS_KALMAN_FILTER_H
 
 //------------------------------------------------------------------------------
 // Include files
 //------------------------------------------------------------------------------
 
-#include <float.h>
+#include <cstdint>
+#include <limits>
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <Eigen/SVD>
+
+#include <Plat4m_Controls/Estimator.h>
 
 //------------------------------------------------------------------------------
 // Namespaces
@@ -68,10 +70,10 @@ namespace Controls
 //------------------------------------------------------------------------------
 
 template<typename ValueType,
-         uint32_t nStates,
-         uint32_t nObservables,
-         uint32_t nControlInputs>
-class KalmanFilter
+         std::uint32_t nStates,
+         std::uint32_t nObservables,
+         std::uint32_t nControlInputs>
+class KalmanFilter :  public Estimator<ValueType, nStates, nControlInputs>
 {
 public:
 
@@ -79,61 +81,42 @@ public:
     // Public types
     //--------------------------------------------------------------------------
 
-	typedef Eigen::Matrix<ValueType, nStates, nStates> MatrixNbyN;
+    typedef Eigen::Matrix<ValueType, nStates, nStates> MatrixNbyN;
 
-	typedef Eigen::Matrix<ValueType, nStates, nObservables> MatrixNbyM;
+    typedef Eigen::Matrix<ValueType, nStates, nObservables> MatrixNbyM;
 
-	typedef Eigen::Matrix<ValueType, nObservables, nStates> MatrixMbyN;
+    typedef Eigen::Matrix<ValueType, nObservables, nStates> MatrixMbyN;
 
-	typedef Eigen::Matrix<ValueType, nObservables, nObservables> MatrixMbyM;
+    typedef Eigen::Matrix<ValueType, nObservables, nObservables> MatrixMbyM;
 
-	typedef Eigen::Matrix<ValueType, nStates, 1> VectorN;
+    typedef Eigen::Matrix<ValueType, nStates, 1> VectorN;
 
-	typedef Eigen::Matrix<ValueType, nObservables, 1> VectorM;
+    typedef Eigen::Matrix<ValueType, nObservables, 1> VectorM;
 
     //--------------------------------------------------------------------------
     // Public constructors
     //--------------------------------------------------------------------------
 
-	KalmanFilter() :
-		myXVector(),
-		myFMatrix(),
-		myUVector(),
-		myBMatrix(),
-		myHMatrix(),
-		myPMatrix(),
-		myQMatrix(),
-		myRMatrix()
-	{
-	}
+    KalmanFilter() :
+        x(),
+        f(),
+        u(),
+        B(),
+        H(),
+        P(),
+        Q(),
+        R()
+    {
+    }
 
     //--------------------------------------------------------------------------
     // Public methods
     //--------------------------------------------------------------------------
 
-	//--------------------------------------------------------------------------
-	void predict()
-	{
-		// State estimate
-		// X = (F * X) + (B * U)
-		//
-		// Where...
-		// X = state vector
-		// F = state transition matrix
-		// B = control matrix
-		// U = control input vector
-		//
-        myXVector = myFMatrix * myXVector;
-
-		// Covariance estimate
-		// P = (F * P * F_T) + Q
-		myPMatrix = (myFMatrix * myPMatrix * myFMatrix.transpose()) + myQMatrix;
-	}
-
     //--------------------------------------------------------------------------
-    void predict(const Eigen::Matrix<ValueType, nControlInputs, 1>& uVector)
+    void updateMeasurement(const Estimator::VectorN& measurementVector)
     {
-        myUVector = uVector;
+        u = measurementVector;
 
         // State estimate
         // X = (F * X) + (B * U)
@@ -144,167 +127,164 @@ public:
         // B = control matrix
         // U = control input vector
         //
-        myXVector = (myFMatrix * myXVector) + (myBMatrix * myUVector);
+        x = (F * x) + (B * u);
 
         // Covariance estimate
-        // P = (F * P * F_T) + Q
-        myPMatrix = (myFMatrix * myPMatrix * myFMatrix.transpose()) + myQMatrix;
+        P = (F * P * F.transpose()) + Q;
     }
 
-	//--------------------------------------------------------------------------
-	void update(const VectorM& measurementVector)
-	{
-		VectorM yVector;
-		MatrixMbyM sMatrix;
-		MatrixMbyM sMatrixInverse;
-		MatrixNbyM kMatrix;
+    //--------------------------------------------------------------------------
+    void updateCorrection(const VectorM& correctionVector)
+    {
+        const VectorM& z = correctionVector;
 
-		// Measurement
-		yVector = measurementVector - (myHMatrix * myXVector);
+        // Measurement
+        const VectorM y = z - (H * x);
 
-		// Residual covariance
+        // Residual covariance
 
-		sMatrix = (myHMatrix * myPMatrix * myHMatrix.transpose()) + myRMatrix;
+        const MatrixMByM s = (x * P * H.transpose()) + R;
 
-		sMatrixInverse = pseudoInverse(sMatrix);
+        const MatrixMbyM sInverse = pseudoInverse(s);
 
-		// Kalman gain
-		kMatrix = myPMatrix * myHMatrix.transpose() * sMatrixInverse;
+        // Kalman gain
+        const MatrixMbyM K = P * H.transpose() * sInverse;
 
-		// Updated state estimate
-		myXVector = myXVector + kMatrix * yVector;
-		// Updated estimate covariance
-		myPMatrix = (MatrixNbyN::Identity() - kMatrix * myHMatrix) * myPMatrix;
-	}
+        // Updated state estimate
+        x = x + K * y;
+        // Updated estimate covariance
+        P = (MatrixNbyN::Identity() - K * H) * P;
+    }
 
-	//--------------------------------------------------------------------------
-	static MatrixMbyM pseudoInverse(const MatrixMbyM& matrix)
-	{
+    //--------------------------------------------------------------------------
+    static MatrixMbyM pseudoInverse(const MatrixMbyM& matrix)
+    {
         // Compute Moore-Penrose pseudo inverse
 
-		ValueType pinvTolerance = FLT_EPSILON;
+        const ValueType pinvTolerance =
+                                      std::numeric_limits<ValueType>::epsilon();
 
-		Eigen::JacobiSVD<MatrixMbyM> matrixSvd(matrix,
-		                                       Eigen::ComputeFullU |
-											   Eigen::ComputeFullV);
-		VectorM inverseSvdValues;
+        Eigen::JacobiSVD<MatrixMbyM> matrixSvd(matrix,
+                                               Eigen::ComputeFullU |
+                                               Eigen::ComputeFullV);
+        VectorM inverseSvdValues;
 
-		for (uint32_t i = 0; i < nObservables; i++)
-		{
-		    if (matrixSvd.singularValues()(i) > pinvTolerance)
-		    {
-		        inverseSvdValues(i) = 1.0f / matrixSvd.singularValues()(i);
-		    }
-		    else
-		    {
-		        inverseSvdValues(i) = 0.0f;
-		    }
-		}
+        for (std::uint32_t i = 0; i < nObservables; i++)
+        {
+            if (matrixSvd.singularValues()(i) > pinvTolerance)
+            {
+                inverseSvdValues(i) = 1.0f / matrixSvd.singularValues()(i);
+            }
+            else
+            {
+                inverseSvdValues(i) = 0.0f;
+            }
+        }
 
-		MatrixMbyM matrixInverse;
+        MatrixMbyM matrixInverse;
 
-		matrixInverse = (matrixSvd.matrixV()           *
-		                 inverseSvdValues.asDiagonal() *
-		                 matrixSvd.matrixU().transpose());
+        matrixInverse = (matrixSvd.matrixV()           *
+                         inverseSvdValues.asDiagonal() *
+                         matrixSvd.matrixU().transpose());
 
-		return matrixInverse;
-	}
+        return matrixInverse;
+    }
 
-	//--------------------------------------------------------------------------
-	VectorN& getXVector()
-	{
-		return myXVector;
-	}
+    //--------------------------------------------------------------------------
+    VectorN& x()
+    {
+        return x;
+    }
 
-	//--------------------------------------------------------------------------
-	VectorN& getStateVector()
-	{
-		return myXVector;
-	}
+    //--------------------------------------------------------------------------
+    VectorN& getStateVector()
+    {
+        return x();
+    }
 
-	//--------------------------------------------------------------------------
-	MatrixNbyN& getFMatrix()
-	{
-		return myFMatrix;
-	}
+    //--------------------------------------------------------------------------
+    MatrixNbyN& f()
+    {
+        return f;
+    }
 
-	//--------------------------------------------------------------------------
-	MatrixNbyN& getStateTransitionMatrix()
-	{
-		return myFMatrix;
-	}
+    //--------------------------------------------------------------------------
+    MatrixNbyN& getStateTransitionMatrix()
+    {
+        return f();
+    }
 
-	//--------------------------------------------------------------------------
-	Eigen::Matrix<ValueType, nControlInputs, 1>& getUVector()
-	{
-		return myUVector;
-	}
+    //--------------------------------------------------------------------------
+    Eigen::Matrix<ValueType, nControlInputs, 1>& u()
+    {
+        return u;
+    }
 
-	//--------------------------------------------------------------------------
-	Eigen::Matrix<ValueType, nControlInputs, 1>& getControlInputVector()
-	{
-		return myUVector;
-	}
+    //--------------------------------------------------------------------------
+    Eigen::Matrix<ValueType, nControlInputs, 1>& getControlInputVector()
+    {
+        return u();
+    }
 
-	//--------------------------------------------------------------------------
-	Eigen::Matrix<ValueType, nStates, nControlInputs>& getBMatrix()
-	{
-		return myBMatrix;
-	}
+    //--------------------------------------------------------------------------
+    Eigen::Matrix<ValueType, nStates, nControlInputs>& B()
+    {
+        return B;
+    }
 
-	//--------------------------------------------------------------------------
-	Eigen::Matrix<ValueType, nStates, nControlInputs>& getControlMatrix()
-	{
-		return myBMatrix;
-	}
+    //--------------------------------------------------------------------------
+    Eigen::Matrix<ValueType, nStates, nControlInputs>& getControlMatrix()
+    {
+        return B();
+    }
 
-	//--------------------------------------------------------------------------
-	MatrixMbyN& getHMatrix()
-	{
-		return myHMatrix;
-	}
+    //--------------------------------------------------------------------------
+    MatrixMbyN& H()
+    {
+        return H;
+    }
 
-	//--------------------------------------------------------------------------
-	MatrixMbyN& getObservationMatrix()
-	{
-		return myHMatrix;
-	}
+    //--------------------------------------------------------------------------
+    MatrixMbyN& getObservationMatrix()
+    {
+        return H();
+    }
 
-	//--------------------------------------------------------------------------
-	MatrixNbyN& getPMatrix()
-	{
-		return myPMatrix;
-	}
+    //--------------------------------------------------------------------------
+    MatrixNbyN& P()
+    {
+        return P;
+    }
 
-	//--------------------------------------------------------------------------
-	MatrixNbyN& getPredictedCovarianceMatrix()
-	{
-		return myPMatrix;
-	}
+    //--------------------------------------------------------------------------
+    MatrixNbyN& getPredictedCovarianceMatrix()
+    {
+        return P();
+    }
 
-	//--------------------------------------------------------------------------
-	MatrixNbyN& getQMatrix()
-	{
-		return myQMatrix;
-	}
+    //--------------------------------------------------------------------------
+    MatrixNbyN& Q()
+    {
+        return Q;
+    }
 
-	//--------------------------------------------------------------------------
-	MatrixNbyN& getProcessErrorCovarianceMatrix()
-	{
-		return myQMatrix;
-	}
+    //--------------------------------------------------------------------------
+    MatrixNbyN& getProcessErrorCovarianceMatrix()
+    {
+        return Q();
+    }
 
-	//--------------------------------------------------------------------------
-	MatrixMbyM& getRMatrix()
-	{
-		return myRMatrix;
-	}
+    //--------------------------------------------------------------------------
+    MatrixMbyM& R()
+    {
+        return R;
+    }
 
-	//--------------------------------------------------------------------------
-	MatrixMbyM& getMeasurementErrorCovarianceMatrix()
-	{
-		return myRMatrix;
-	}
+    //--------------------------------------------------------------------------
+    MatrixMbyM& getMeasurementErrorCovarianceMatrix()
+    {
+        return R();
+    }
 
 private:
 
@@ -312,57 +292,57 @@ private:
     // Private data members
     //--------------------------------------------------------------------------
 
-	///
-	/// @brief Contains the current values of the filtered state variables. Also
-	/// called state vector.
-	///
-	VectorN myXVector;
+    ///
+    /// @brief Contains the current values of the filtered state variables. Also
+    /// called state vector.
+    ///
+    VectorN x;
 
-	///
-	/// @brief Defines how the state variables relate to each other. Also called
-	/// state transition matrix.
-	///
-	MatrixNbyN myFMatrix;
+    ///
+    /// @brief Defines how the state variables relate to each other. Also called
+    /// state transition matrix.
+    ///
+    MatrixNbyN f;
 
-	///
-	/// @brief Stores the control input values. Also called control input
-	/// vector.
-	///
-	Eigen::Matrix<ValueType, nControlInputs, 1> myUVector;
+    ///
+    /// @brief Stores the control input values. Also called control input
+    /// vector.
+    ///
+    Eigen::Matrix<ValueType, nControlInputs, 1> u;
 
-	///
-	/// @brief Defines how the control inputs relate to the state variables.
-	/// Also called control matrix.
-	///
-	Eigen::Matrix<ValueType, nStates, nControlInputs> myBMatrix;
+    ///
+    /// @brief Defines how the control inputs relate to the state variables.
+    /// Also called control matrix.
+    ///
+    Eigen::Matrix<ValueType, nStates, nControlInputs> B;
 
-	///
-	/// @brief Defines what state variables are physically observed or measured.
-	/// Also called observation matrix.
-	///
-	MatrixMbyN myHMatrix;
+    ///
+    /// @brief Defines what state variables are physically observed or measured.
+    /// Also called observation matrix.
+    ///
+    MatrixMbyN H;
 
-	///
-	/// @brief Contains the current covariance estimate for each state variable.
-	/// Also called predicted covariance matrix.
-	///
-	MatrixNbyN myPMatrix;
+    ///
+    /// @brief Contains the current covariance estimate for each state variable.
+    /// Also called predicted covariance matrix.
+    ///
+    MatrixNbyN P;
 
-	///
-	/// @brief Defines the process error covariance estimates for each state
-	/// variable. Also called process error covariance matrix.
-	///
-	MatrixNbyN myQMatrix;
+    ///
+    /// @brief Defines the process error covariance estimates for each state
+    /// variable. Also called process error covariance matrix.
+    ///
+    MatrixNbyN Q;
 
-	///
-	/// @brief Defines the measurement error covariance estimates for each state
-	/// variable. Also called measurement error covariance matrix.
-	///
-	MatrixMbyM myRMatrix;
+    ///
+    /// @brief Defines the measurement error covariance estimates for each state
+    /// variable. Also called measurement error covariance matrix.
+    ///
+    MatrixMbyM R;
 };
 
 }; // namespace Controls
 
 }; // namespace Plat4m
 
-#endif // PLAT4M_KALMAN_FILTER_H
+#endif // PLAT4M_CONTROLS_KALMAN_FILTER_H
