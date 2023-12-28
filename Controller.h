@@ -123,8 +123,8 @@ protected:
     //--------------------------------------------------------------------------
 
     Controller(const RealNumber minSetPoint,
-    		   const RealNumber maxSetPoint,
-    		   const RealNumber minOutput,
+               const RealNumber maxSetPoint,
+               const RealNumber minOutput,
                const RealNumber maxOutput,
                const RealNumber updateRateHz);
 
